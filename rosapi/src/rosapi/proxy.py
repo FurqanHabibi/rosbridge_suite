@@ -72,7 +72,11 @@ def get_topics_types(topics, topics_glob):
 
 def get_topics_for_type(type, topics_glob):
     # Filter the list of topics by whether they are public before returning.
-    return filter_globs(topics_glob, find_by_type(type))
+    try:
+        publishers, subscribers, services = Master('/rosbridge').getSystemState()
+        return filter_globs(filter_globs(topics_glob, find_by_type(type)), list(set([x for x, _ in publishers] + [x for x, _, in subscribers])))
+    except:
+        return []
 
 
 def get_services(services_glob):
